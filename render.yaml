@@ -6,3 +6,4 @@ services:
     startCommand: "gunicorn flask_static_page:app"
     plan: free
 
+
