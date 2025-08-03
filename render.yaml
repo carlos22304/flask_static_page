@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: flask-static-page
+    env: python
+    buildCommand: ""
+    startCommand: "python flask_static_page.py"
+    plan: free
