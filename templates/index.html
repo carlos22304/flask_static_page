@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1 class="display-4 text-center">Welcome to Chattanooga!</h1>
+<p class="lead text-center">A beautiful city nestled along the Tennessee River.</p>
+<h2>Explore Our Gallery</h2>
+<<div class="gallery">
+
+    <img src="{{ url_for('static', filename='image1.jpg') }}">
+    <img src="{{ url_for('static', filename='image2.jpg') }}">
+    <img src="{{ url_for('static', filename='image3.jpg') }}">
+    <img src="{{ url_for('static', filename='image4.jpg') }}">
+    <img src="{{ url_for('static', filename='image5.jpg') }}">
+</div>
+
+{% endblock %}
