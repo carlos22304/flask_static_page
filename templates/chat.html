@@ -1,88 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Talk to ZOE</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            padding-top: 60px;
-        }
-        .chat-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-        .bubble {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 8px;
-        }
-        .user {
-            background-color: #cce5ff;
-            text-align: right;
-        }
-        .bot {
-            background-color: #e2e3e5;
-            text-align: left;
-        }
-        #messages {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-        input {
-            width: 75%;
-            padding: 8px;
-        }
-        button {
-            padding: 8px 12px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>ZOE – Your Chat Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: white;
+      width: 420px;
+      height: 600px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #5e81ac;
+      color: white;
+      padding: 20px;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .bubble {
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin: 10px 0;
+      max-width: 80%;
+      word-wrap: break-word;
+      font-size: 14px;
+    }
+
+    .user {
+      background: #cce5ff;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #f2f2f2;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 15px;
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    button {
+      background: #5e81ac;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #4c6a94;
+    }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <h3>Talk to ZOE</h3>
-        <div id="messages"></div>
-        <input type="text" id="user-input" placeholder="Ask ZOE something...">
-        <button onclick="sendMessage()">Send</button>
+  <div class="chat-container">
+    <div class="chat-header">ZOE – Your Assistant</div>
+    <div id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
+  </div>
 
-    <script>
-        function speak(text) {
-            const synth = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
-            synth.speak(utterance);
-        }
+  <script>
+    function speak(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
 
-        async function sendMessage() {
-            const userInput = document.getElementById('user-input').value;
-            if (!userInput.trim()) return;
+      // Try to use a female voice
+      const femaleVoice = synth.getVoices().find(voice =>
+        voice.name.toLowerCase().includes('female') ||
+        voice.name.toLowerCase().includes('zoe') ||
+        voice.name.toLowerCase().includes('samantha') ||
+        voice.name.toLowerCase().includes('zira')
+      );
 
-            const msgBox = document.getElementById('messages');
-            msgBox.innerHTML += `<div class="bubble user"><strong>You:</strong> ${userInput}</div>`;
-            document.getElementById('user-input').value = '';
+      if (femaleVoice) {
+        utterance.voice = femaleVoice;
+      }
 
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userInput })
-            });
+      utterance.lang = 'en-US';
+      synth.speak(utterance);
+    }
 
-            const data = await response.json();
-            const botReply = data.response;
+    async function sendMessage() {
+      const inputField = document.getElementById('user-input');
+      const userInput = inputField.value.trim();
+      if (!userInput) return;
 
-            msgBox.innerHTML += `<div class="bubble bot"><strong>ZOE:</strong> ${botReply}</div>`;
-            speak(botReply);
-        }
-    </script>
+      const msgBox = document.getElementById('messages');
+      msgBox.innerHTML += `<div class="bubble user"><strong>You:</strong> ${userInput}</div>`;
+      inputField.value = '';
+
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userInput })
+      });
+
+      const data = await response.json();
+      const botReply = data.response;
+
+      msgBox.innerHTML += `<div class="bubble bot"><strong>ZOE:</strong> ${botReply}</div>`;
+      msgBox.scrollTop = msgBox.scrollHeight;
+      speak(botReply);
+    }
+  </script>
 </body>
 </html>
-
-   
